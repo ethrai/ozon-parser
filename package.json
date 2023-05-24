@@ -1,0 +1,40 @@
+{
+  "name": "ozon-parser",
+  "module": "",
+  "productName": "ozon-parser",
+  "version": "1.0.0",
+  "description": "My Electron application description",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start-front-debug": "electronmon .",
+    "start": "electronmon .",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "echo \"No linting configured\""
+  },
+  "keywords": [],
+  "author": {
+    "name": "ryzzax21",
+    "email": "ryzzax@proton.me"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^5.2.3",
+    "electron-squirrel-startup": "^1.0.0",
+    "electronmon": "^2.0.2",
+    "handlebars": "^4.7.7",
+    "jquery": "^3.7.0",
+    "puppeteer": "^20.2.1",
+    "sqlite3": "^5.1.6",
+    "user-agents": "^1.0.1386"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.1.1",
+    "@electron-forge/maker-deb": "^6.1.1",
+    "@electron-forge/maker-rpm": "^6.1.1",
+    "@electron-forge/maker-squirrel": "^6.1.1",
+    "@electron-forge/maker-zip": "^6.1.1",
+    "electron": "24.3.1"
+  }
+}
