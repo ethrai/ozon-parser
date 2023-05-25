@@ -6,11 +6,11 @@ const { writeData, getData, dbClose, getSelections, getSelectionProducts } = req
 
 let isParsing = true
 
-function sendStop () {
+function sendStop() {
   isParsing = false
 }
 
-async function parseAll (event) {
+async function parseAll(event) {
   const browser = await puppeteer.launch({ headless: 'new' })
   const page = await browser.newPage()
   await page.setUserAgent(UserAgent.toString())
@@ -45,11 +45,7 @@ async function parseAll (event) {
   if (!isParsing) isParsing = true
 }
 
-function onProductParsed (title, price, seller, url) {
-  return { title, price, seller, url }
-}
-
-async function parsePage (page, event) {
+async function parsePage(page, event) {
   const productXpath =
     '/html/body/div[1]/div/div[1]/div[2]/div[2]/div[2]/div[3]/div[1]/div[1]/div/div[*]'
   const titleXpath = './div[2]/div/a'
@@ -85,14 +81,13 @@ async function parsePage (page, event) {
       const [sellerElement] = await product.$$('xpath/' + sellerXpath)
       const seller = await sellerElement.evaluate((e) => e.textContent.trim())
 
-      event.sender.send('send:product', { title, price, seller, url })
-
-      return { title, price, seller, url }
+      event.sender.send('retrieve:data', { title, price, seller, url })
+      console.log('Product parsed, data shoud\'ve been sent')
     })
   )
 }
 
-function parsePrice (price) {
+function parsePrice(price) {
   const regex = /(\d[\d\s,.]*)\s*(BYN)/
   const match = price.match(regex)
   return match[1].replace(/\s/g, '')

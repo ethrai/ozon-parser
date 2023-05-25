@@ -43,21 +43,11 @@ const createWindow = () => {
     console.log('open:externalLink triggered')
     shell.openExternal(link)
   })
-  ipcMain.on('show:settingsWindow', () => createSettingsWindow())
-  ipcMain.on('stop:parsing', () => sendStop())
-
-  ipcMain.handle('start:parsing', () => getAndSend())
-  ipcMain.handle('get:data:selections', async () => await getSelections())
-  ipcMain.handle('get:data:selectionProducts', () => getSelectionProducts())
-  ipcMain.handle('save:data', (_, data) => saveData(data))
+  ipcMain.on('start:parsing', async (event) => await parseAll(event))
 }
 
-async function getAndSend (event) {
+async function startParsing(event) {
   await parseAll(event)
-}
-
-async function sendData (event, product = undefined) {
-  event.sender.send('send:product', product ?? 'No product')
 }
 
 app.on('window-all-closed', () => {
@@ -75,7 +65,7 @@ app.on('activate', () => {
 
 // My handlers
 
-async function handleCreateSettingWindow (event, ...args) {
+async function handleCreateSettingWindow(event, ...args) {
   createSettingsWindow()
 }
 
