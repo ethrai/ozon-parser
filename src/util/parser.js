@@ -1,10 +1,12 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer')
 
 /**
  * @type puppeteer.Browser
  */
-let browser;
-let page;
+let browser
+let page
+let counter = 0
+let isParsing = true
 
 /**
  * @return {Promise<puppeteer.Browser>}
@@ -14,76 +16,131 @@ async function init() {
     headless: 'new',
     args: ['--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)' +
       'Chrome/58.0.3029.110 Safari/537.36'],
-  });
-  page = await browser.newPage();
+  })
+  page = await browser.newPage()
+}
+
+function stopParsing() {
+  isParsing = false
 }
 
 /**
+ * @param {Electron.IpcMainEvent} event
  * @return {Promise<void>}
  */
-async function parseAll() {
-  await init();
+async function parseAll(event) {
+  await init()
   await page.goto('https://ozon.by/category/noutbuki-15692/apple-26303000/',
-      {waitUntil: 'domcontentloaded'});
-  console.log(await page.title());
+    { waitUntil: 'domcontentloaded' })
+  console.log(await page.title())
 
+  let msg
   const navButtonsXpath =
-    'xpath/html/body/div[1]/div/div[1]/div[2]/div[2]/div[2]/div[3]/div[2]/div/div[1]/div[1]/a[position()<last()]';
-  const navButtons = await page.$$(navButtonsXpath);
-  console.log(navButtons.length !== 0);
+    'xpath/html/body/div[1]/div/div[1]/div[2]/div[2]/div[2]/div[3]/div[2]/div/div[1]/div[1]/a[position()<last()]'
+  let navButtons = await page.$$(navButtonsXpath)
+  console.log(navButtons.length !== 0)
   for (let i = 0; i < navButtons.length; i++) {
-    const btn = navButtons[i];
-    const url = await btn.evaluate((b) => b.href);
+    if (!isParsing) {
+      break
+    }
+    navButtons = await page.$$(navButtonsXpath)
+    const btn = navButtons[i]
+    const url = await btn.evaluate((b) => b.href)
     try {
-      const newPage = await browser.newPage();
-      await newPage.goto(url, {waitUntil: 'domcontentloaded'});
-      // await parsePage(newPage);
-      console.log(newPage.url());
-      await newPage.close();
+      const newPage = await browser.newPage()
+      await newPage.goto(url, { waitUntil: 'load' })
+      await parsePage(newPage, event)
+      console.log(newPage.url())
+      await newPage.close()
     } catch (e) {
-      console.error(`Error navigating to ${url}`);
-      console.error(e);
+      console.error(`Error navigating to ${url}`)
+      console.error(e)
     }
   }
-  // await Promise.all(
-  //     navButtons.map(async (btn) => {
-  //       const url = await btn.evaluate((b) => b.href);
-  //       try {
-  //         const newPage = await browser.newPage();
-  //         setTimeout(() => { }, 1000);
-  //         await newPage.goto(url, {waitUntil: 'domcontentloaded'});
-  //         await parsePage(newPage);
-  //         console.log(newPage.url());
-  //         await newPage.close();
-  //       } catch (e) {
-  //         console.error(`Error navigating to ${url}`);
-  //         console.error(e);
-  //       }
-  //     }),
-  // );
-  await browser.close();
+
+  await browser.close()
+  if (!isParsing) {
+    msg = 'Парсинг окончен: Пользователь остановил парсинг'
+    console.log(msg);
+    isParsing = true
+  } else {
+    msg = 'Парсинг окончен: Все страницы просмотрены'
+    console.log(msg);
+  }
 }
 
 /**
- *
  * @param {puppeteer.Page} page
+ * @param {Electron.IpcMainEvent} event
  */
-async function parsePage(page) {
-  const productsXpath = 'xpath/html/body/div[1]/div/div[1]/div[2]/div[2]/div[2]/div[3]/div[1]/div[1]/div/div[*]';
-  const titleXpath = 'xpath/div[2]/div[1]/a';
-  await page.waitForSelector(productsXpath);
+async function parsePage(page, event) {
+  const productsXpath = 'xpath/html/body/div[1]/div/div[1]/div[2]/div[2]/div[2]/div[3]/div[1]/div[1]/div/div[*]'
+  const titleXpath = 'xpath/div[2]/div[1]/a'
+  const priceXpath = 'xpath/div[3]/div[1]/div[1]'
+  const price2Xpath = 'xpath/div[3]/div[1]/span/span[1]'
+  const sellerXpath = 'xpath/div[3]/div[2]/div/span/span/font'
+  await page.waitForSelector(productsXpath, { 'timeout': 5000 })
   /**
    * @type puppeteer.ElementHandle[]
    */
-  const products = await page.$$(productsXpath);
-  for (let i = 0; i < products.length; i++) {
-    const product = products[i];
-    const titleEl = await product.waitForSelector(titleXpath, {timeout: 5000});
-    const title = await titleEl.evaluate((e) => e.textContent.trim());
-    console.log(title);
+  let products
+  await page.waitForSelector(productsXpath, { 'timeout': 5000 })
+  for (let i = 0; i < 10; i++) {
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 15))
+      products = await page.$$(productsXpath)
+    } catch (error) {
+      console.error(`Error getting products on page ${page.url()}`)
+      console.error(`Retrying... ${i}`)
+    }
+    if (products) {
+      console.log('products found')
+      break
+    }
   }
+  for (let i = 0; i < products.length; i++) {
+    // await new Promise((resolve) => setTimeout(resolve, 15));
+    for (let j = 0; j < 10; j++) {
+      try {
+        products = await page.$$(productsXpath)
+      } catch (error) {
+        console.error(`Error getting products on page ${page.url()}`)
+        console.error(`Retrying... ${j}`)
+      }
+      if (products) break
+    }
+    const product = products[i]
+    const titleEl = await product.waitForSelector(titleXpath, { timeout: 5000 })
+    const title = await titleEl.evaluate((e) => e.textContent.trim())
+
+    const url = await titleEl.evaluate((e) => e.href)
+    let priceElement
+    try {
+      priceElement = await product.waitForSelector(priceXpath, { timeout: 150 })
+    } catch (e) {
+      priceElement = await product.waitForSelector(price2Xpath)
+    }
+    let price = await priceElement.evaluate((e) => e.innerText.trim())
+    price = parsePrice(price)
+
+    const sellerElement = await product.waitForSelector(sellerXpath, { timeout: 150 })
+    const seller = await sellerElement.evaluate((e) => e.innerText.trim())
+    event.sender.send('retrieve:data', { counter, title, price, url, seller })
+    counter++
+}
 }
 
-(async () => {
-  await parseAll();
-})();
+function parsePrice(price) {
+  const regex = /(\d[\d\s,.]*)\s*(BYN)/
+  const match = price.match(regex)
+  return match[1].replace(/\s/g, '')
+}
+
+// (async () => {
+//   await parseAll();
+// })();
+
+module.exports = {
+  parseAll,
+  stopParsing,
+}

@@ -1,7 +1,7 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron')
 const path = require('path')
 const db = require('../util/database')
-const { parseAll, sendStop } = require('../util/scrapper')
+const { parseAll, stopParsing } = require('../util/parser')
 const { getSelections, getSelectionProducts, saveData } = require(
   '../util/database')
 
@@ -44,11 +44,9 @@ const createWindow = () => {
     shell.openExternal(link)
   })
   ipcMain.on('start:parsing', async (event) => await parseAll(event))
+  ipcMain.on('stop:parsing', async (event) => stopParsing())
 }
 
-async function startParsing(event) {
-  await parseAll(event)
-}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
