@@ -1,17 +1,17 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron')
-const path = require('path')
-const db = require('../util/database')
-const { parseAll, stopParsing } = require('../util/parser')
-const { getSelections, getSelectionProducts, saveData } = require(
-  '../util/database')
+const {app, BrowserWindow, ipcMain, shell, dialog} = require('electron');
+const path = require('path');
+const db = require('../util/database');
+const {parseAll, stopParsing} = require('../util/parser');
+const {getSelections, getSelectionProducts, saveData} = require(
+    '../util/database');
 
-const rendererFolder = path.join(__dirname, '..', 'renderer')
+const rendererFolder = path.join(__dirname, '..', 'renderer');
 
 if (require('electron-squirrel-startup')) {
-  app.quit()
+  app.quit();
 }
-let mainWindow
-let settingsWindow
+let mainWindow;
+let settingsWindow;
 
 const createSettingsWindow = () => {
   settingsWindow = new BrowserWindow({
@@ -21,55 +21,81 @@ const createSettingsWindow = () => {
     parent: mainWindow,
     show: false,
     autoHideMenuBar: true,
-  })
-  settingsWindow.loadFile(path.join(rendererFolder, 'settings.html'))
+  });
+  settingsWindow.loadFile(path.join(rendererFolder, 'settings.html'));
 
-  settingsWindow.once('ready-to-show', () => settingsWindow.show())
+  settingsWindow.once('ready-to-show', () => settingsWindow.show());
 
   settingsWindow.on('close', () => {
-    mainWindow.webContents.send('settingsWindowClosed')
-  })
+    mainWindow.webContents.send('settingsWindowClosed');
+  });
 
-}
+};
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 1600, height: 1200, webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     }, autoHideMenuBar: true,
-  })
-  mainWindow.loadFile(path.join(rendererFolder, 'index.html'))
+  });
+  mainWindow.loadFile(path.join(rendererFolder, 'index.html'));
   ipcMain.on('open:externalLink', (event, link) => {
-    console.log('open:externalLink triggered')
-    shell.openExternal(link)
-  })
-  ipcMain.on('start:parsing', async (event) => await parseAll(event))
-  ipcMain.on('stop:parsing', async (event) => stopParsing())
+    console.log('open:externalLink triggered');
+    shell.openExternal(link);
+  });
+  ipcMain.on('start:parsing', async (event) => await parseAll(event));
+  ipcMain.on('stop:parsing', async (event) => stopParsing());
+  ipcMain.on('save:products',
+      async (event, data) => handleSaveData(event, data));
+  ipcMain.on('show:dialog',
+      async (event, title, message, type) => await createDialogInfo(title,
+          message, type));
+
+  ipcMain.handle('get:latestSelection',
+      async (event) => await getLatestSelection());
+
+};
+
+async function createDialogInfo(title, message, type = 'info') {
+  const opts = {
+    type,
+    title,
+    message,
+  };
+  await dialog.showMessageBox(opts);
 }
 
+async function handleSaveData(event, data) {
+  const selectionObject = await saveData(data);
+  if (selectionObject) {
+    await createDialogInfo('Успех',
+        `Данные успешно сохранены: ${selectionObject.created_time}`);
+    mainWindow.webContents.send('save:products:ok', selectionObject);
+  }
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
-    db.closeDb()
+    app.quit();
+    db.closeDb();
   }
-})
+});
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    createWindow();
   }
-})
+});
 
 // My handlers
 
 async function handleCreateSettingWindow(event, ...args) {
-  createSettingsWindow()
+  createSettingsWindow();
 }
 
 // My listeners
 
 app.whenReady().then(() => {
-  createWindow()
-})
+  createWindow();
+});
 
