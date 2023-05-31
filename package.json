@@ -7,7 +7,7 @@
   "main": "src/main/main.js",
   "scripts": {
     "start-front-debug": "electronmon .",
-    "start": "electronmon .",
+    "start": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -23,6 +23,9 @@
     "bootstrap": "^5.2.3",
     "electron-squirrel-startup": "^1.0.0",
     "electronmon": "^2.0.2",
+    "eslint-plugin-flowtype": "^8.0.3",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-react": "^7.32.2",
     "handlebars": "^4.7.7",
     "jquery": "^3.7.0",
     "puppeteer": "^20.2.1",
@@ -36,11 +39,13 @@
     "@electron-forge/maker-squirrel": "^6.1.1",
     "@electron-forge/maker-zip": "^6.1.1",
     "electron": "24.3.1",
-    "eslint": "^8.41.0",
-    "eslint-config-standard": "^17.0.0",
+    "eslint-config-semistandard": "^17.0.0",
+    "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.7.0",
-    "eslint-plugin-promise": "^6.1.1"
+    "eslint-plugin-n": "^16.0.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-standard": "^5.0.0"
   },
   "electronmon": {
     "ignore": "src/main/**/*"

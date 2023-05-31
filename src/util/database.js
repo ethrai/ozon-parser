@@ -1,5 +1,4 @@
 const path = require('path');
-const {reject} = require('eslint-plugin-promise/rules/lib/promise-statics');
 const sqlite3 = require('sqlite3').verbose();
 
 const dbPath = path.join(__dirname, '..', '..', 'sqlite3.db');
@@ -7,12 +6,7 @@ const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, err => {
   if (err) console.error(err);
 });
 
-/**
- *
- * @param {Electron.IpcMainEvent} event
- * @param {Array<Object>} data
- * @return {Promise<void>}
- */
+
 async function saveData(data) {
   const productCount = data.length;
   db.run(`
@@ -33,17 +27,6 @@ async function saveData(data) {
       });
     }
   });
-  // const selectionObject = await new Promise((resolve, reject) => {
-  //   db.get(
-  //       'SELECT id, created_time, product_count FROM Selection WHERE id = last_insert_rowid()',
-  //       (err, row) => {
-  //         if (err) reject(err);
-  //         else {
-  //           console.log(row);
-  //           resolve(row);
-  //         }
-  //       });
-  // });
   return await getLatestSelection();
 }
 

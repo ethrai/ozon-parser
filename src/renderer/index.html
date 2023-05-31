@@ -32,7 +32,7 @@
             <button id="settingBtn" class="btn btn-primary text-white mx-2">
                 <span>Настройки</span>
             </button>
-            <button class="btn btn-primary text-white">
+            <button id="historyBtn" class="btn btn-primary text-white">
                 <span>История</span>
             </button>
         </div>
@@ -44,46 +44,63 @@
     </div>
 </div>
 <div id="body" class="container-fluid text-center" style="width: 95%">
-    <div id="btnToolbar" class="row align-content-center">
-        <div class="btn-toolbar justify-content-between my-2">
-            <div id="btnGroup" class="btn-group btn-group-sm">
-                <button class="btn btn-success mx-1">Начать парсинг</button>
-                <button class="btn btn-danger disabled">Остановить парсинг</button>
-                <button class="btn btn-secondary mx-1 visually-hidden">Очистить</button>
-            </div>
-            <div class="btn-group btn-group-sm">
-                <button id="saveBtn" class="btn btn-outline-secondary mx-1">
-                    Сохранить
-                </button>
-                <button class="btn btn-outline-secondary">Экспортировать</button>
-            </div>
-        </div>
-    </div>
-    <div id="tables" class="row justify-content-center align-content-center">
+    <div class="row">
         <div class="col">
-            <div class="row align-content-center justify-content-center small">
+            <div id="btnToolbar" class="row align-content-center">
+                <div class="btn-toolbar justify-content-between my-2">
+                    <div id="btnGroup" class="btn-group btn-group-sm">
+                        <button class="btn btn-success mx-1">Начать парсинг</button>
+                        <button class="btn btn-danger disabled">Остановить парсинг</button>
+                        <button class="btn btn-secondary mx-1 visually-hidden">Очистить</button>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                        <button id="saveBtn" class="btn btn-outline-secondary mx-1">
+                            Сохранить
+                        </button>
+                        <button class="btn btn-outline-secondary">Экспортировать</button>
+                    </div>
+                </div>
+            </div>
+            <div id="tables" class="row justify-content-center align-content-center">
+                <div class="col">
+                    <div class="row align-content-center justify-content-center small">
                 <span id="mainTableTitle"
-                      class="fs-5 fw-semibold lh-1 font-monospace text-decoration-underline">Выборка без имени</span>
+                      class="fs-5 fw-semibold lh-1 font-monospace text-decoration-underline">Несохранённая выборка</span>
+                    </div>
+                    <table
+                            id="mainTable"
+                            class="table table-bordered table-striped table-sm"
+                    >
+                        <thead>
+                        <tr>
+                            <th scope="col">№</th>
+                            <th scope="col">Название</th>
+                            <th scope="col">Цена</th>
+                            <th scope="col">Продавец</th>
+                        </tr>
+                        </thead>
+                        <tbody id="mainTableBody"></tbody>
+                    </table>
+                </div>
+                <!-- Second table might be right there-->
+                <div class="col visually-hidden">
+                    <div class="row align-content-center justify-content-center small">
+                        <span id="secondTableTitle"
+                              class="fs-5 fw-semibold lh-1 font-monospace text-decoration-underline">SecondTable</span>
+                    </div>
+                </div>
             </div>
-            <table
-                    id="mainTable"
-                    class="table table-bordered table-striped table-sm"
-            >
-                <thead>
-                <tr>
-                    <th scope="col">№</th>
-                    <th scope="col">Название</th>
-                    <th scope="col">Цена</th>
-                    <th scope="col">Продавец</th>
-                </tr>
-                </thead>
-                <tbody id="mainTableBody"></tbody>
-            </table>
         </div>
-        <div class="col visually-hidden">
-            <div class="row align-content-center justify-content-center small">
-                <span id="secondTableTitle" class="fs-5 fw-semibold lh-1 font-monospace text-decoration-underline">SecondTable</span>
-            </div>
+        <div id="historyPane" class="col-4 border-start visually-hidden">
+            <h4 class="mb-2">История</h4>
+            <table id="historyTable" class="table table-active">
+                <thead>
+                <th>Дата</th>
+                <th>Количество товаров</th>
+                <th data-orderable="false"></th>
+                </thead>
+            </table>
+
         </div>
     </div>
 </div>

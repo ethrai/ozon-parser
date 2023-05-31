@@ -1,9 +1,16 @@
-const {app, BrowserWindow, ipcMain, shell, dialog} = require('electron');
+const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
 const path = require('path');
-const db = require('../util/database');
-const {parseAll, stopParsing} = require('../util/parser');
-const {getSelections, getSelectionProducts, saveData} = require(
-    '../util/database');
+const { parseAll, stopParsing } = require('../util/parser');
+const {
+  // eslint-disable-next-line no-unused-vars
+  getSelections,
+  // eslint-disable-next-line no-unused-vars
+  getSelectionProducts,
+  closeDb,
+  getLatestSelection,
+  saveData
+} = require(
+  '../util/database');
 
 const rendererFolder = path.join(__dirname, '..', 'renderer');
 
@@ -20,7 +27,7 @@ const createSettingsWindow = () => {
     modal: true,
     parent: mainWindow,
     show: false,
-    autoHideMenuBar: true,
+    autoHideMenuBar: true
   });
   settingsWindow.loadFile(path.join(rendererFolder, 'settings.html'));
 
@@ -29,14 +36,16 @@ const createSettingsWindow = () => {
   settingsWindow.on('close', () => {
     mainWindow.webContents.send('settingsWindowClosed');
   });
-
 };
 
 const createWindow = () => {
   mainWindow = new BrowserWindow({
-    width: 1600, height: 1200, webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-    }, autoHideMenuBar: true,
+    width: 1600,
+    height: 1200,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    },
+    autoHideMenuBar: true
   });
   mainWindow.loadFile(path.join(rendererFolder, 'index.html'));
   ipcMain.on('open:externalLink', (event, link) => {
@@ -46,26 +55,25 @@ const createWindow = () => {
   ipcMain.on('start:parsing', async (event) => await parseAll(event));
   ipcMain.on('stop:parsing', async (event) => stopParsing());
   ipcMain.on('save:products',
-      async (event, data) => handleSaveData(event, data));
+    async (event, data) => handleSaveData(event, data));
   ipcMain.on('show:dialog',
-      async (event, title, message, type) => await createDialogInfo(title,
-          message, type));
+    async (event, title, message, type) => await createDialogInfo(title,
+      message, type));
 
   ipcMain.handle('get:latestSelection',
-      async (event) => await getLatestSelection());
-
+    async (event) => await getLatestSelection());
 };
 
-async function createDialogInfo(title, message, type = 'info') {
+async function createDialogInfo (title, message, type = 'info') {
   const opts = {
     type,
     title,
-    message,
+    message
   };
   await dialog.showMessageBox(opts);
 }
 
-async function handleSaveData(event, data) {
+async function handleSaveData (event, data) {
   const selectionObject = await saveData(data);
   if (selectionObject) {
     await createDialogInfo('Успех',
@@ -77,7 +85,7 @@ async function handleSaveData(event, data) {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
-    db.closeDb();
+    closeDb();
   }
 });
 
@@ -89,7 +97,7 @@ app.on('activate', () => {
 
 // My handlers
 
-async function handleCreateSettingWindow(event, ...args) {
+async function handleCreateSettingWindow (event, ...args) {
   createSettingsWindow();
 }
 
@@ -98,4 +106,3 @@ async function handleCreateSettingWindow(event, ...args) {
 app.whenReady().then(() => {
   createWindow();
 });
-
