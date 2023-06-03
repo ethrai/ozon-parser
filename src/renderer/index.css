@@ -1,11 +1,33 @@
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif;
 }
 
+#historyPane {
+  font-size: 85%;
+}
 
+#historyTable tbody tr:hover {
+  cursor: pointer;
+}
+
+.data-cell {
+  max-width: 500px;
+  max-height: 50px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.data-cell:hover {
+  overflow: visible;
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: none;
+  max-height: none;
+}
