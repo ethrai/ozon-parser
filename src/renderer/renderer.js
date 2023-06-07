@@ -6,7 +6,6 @@ const $historyBtn = $('#historyBtn')
 const $mainTable = $('#mainTable')
 const $clearBtn = $('#btnGroup > .btn.btn-secondary')
 const $historyTable = $('#historyTable')
-const $deleteSelectionBtn = $('#deleteSelection')
 const $exportBtn = $('#exportBtn')
 const mainAPI = window.api
 const dataTableLangOpts = {
@@ -165,7 +164,7 @@ $saveBtn.on('click', function () {
 })
 
 // Listener for save:data response
-mainAPI.listenForDataSaved((event, selection) => {
+mainAPI.listenForDataSaved(function (event, selection) {
   currentSelection = selection
   $('#mainTableTitle').text(currentSelection.timestamp)
   updateHistoryTable(selection)
@@ -174,7 +173,7 @@ mainAPI.listenForDataSaved((event, selection) => {
 })
 
 // Listeners for buttons for opening external links
-$(document).on('click', '#link', (event) => {
+$(document).on('click', '#link', function (event) {
   event.preventDefault()
   const href = event.target.href
   mainAPI.openExternal(href)
@@ -189,7 +188,7 @@ $stopParsingBtn.on('click', function () {
 })
 
 // Listener for parsing start
-$startParsingBtn.on('click', async () => {
+$startParsingBtn.on('click', async function () {
   if (currentProductList.length > 0) {
     const opts = {
       title: 'Внимание',
@@ -213,7 +212,6 @@ $clearBtn.on('click', function () {
 })
 
 $exportBtn.on('click', async function () {
-  console.log(currentProductList)
   await mainAPI.exportData({
     products: currentProductList,
     selection: currentSelection
@@ -221,7 +219,7 @@ $exportBtn.on('click', async function () {
 })
 
 // Listener for history panel
-$historyBtn.on('click', () => {
+$historyBtn.on('click', function () {
   const $historyPane = $('#historyPane')
 
   if ($historyPane.hasClass('visually-hidden')) {
@@ -244,7 +242,6 @@ $(async () => {
       updateHistoryTable(selection)
     }
   }
-  console.log($deleteSelectionBtn.parent())
 })
 
 // Listener for deleting selection event
@@ -266,7 +263,6 @@ $('#historyTable tbody').on('click', 'tr', async function () {
       buttons: ['Да', 'Отмена']
     }
     const answer = await mainAPI.sendShowDialogRequest(dialogOpts)
-    console.log(answer)
     if (answer.response !== 0) {
       return
     }
@@ -275,7 +271,6 @@ $('#historyTable tbody').on('click', 'tr', async function () {
   // eslint-disable-next-line camelcase
   const [selectionId, timestamp, product_count] = rowData
   const products = await mainAPI.getProducts(selectionId)
-  console.log(products)
   await renderSavedSelection(products)
   $('#mainTableTitle').text(rowData[1])
   $exportBtn.removeClass('visually-hidden')

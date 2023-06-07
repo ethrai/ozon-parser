@@ -6,7 +6,7 @@
   "description": "My Electron application description",
   "main": "src/main/main.js",
   "scripts": {
-    "start-front-debug": "electronmon .",
+    "frontend-debug": "electronmon .",
     "start": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make",

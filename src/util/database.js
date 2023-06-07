@@ -41,7 +41,6 @@ async function getLatestSelection () {
       (err, row) => {
         if (err) reject(err)
         else {
-          console.log(row)
           resolve(row)
         }
       }
@@ -96,7 +95,6 @@ const deleteSelection = (selectionId) => {
       if (err) {
         console.error(err)
       }
-      console.log('cascade complete')
     })
   })
 }

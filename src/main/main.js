@@ -63,11 +63,7 @@ async function createDialogInfo (opts = { type: 'info', buttons: [] }) {
 }
 
 async function handleExportData (data) {
-  const { selection, products } = data
-  const selectionCsv = new ObjectsToCsv([selection])
-  console.log(products)
-  const productsCsv = new ObjectsToCsv(products)
-  const defaultFileName = formatFileName(data.selection.timestamp)
+  const defaultFileName = formatFileName(data.selection.timestamp) + '.csv'
   const path = await dialog.showSaveDialog(mainWindow, {
     title: 'Выберите директорию для сохранения выборки',
     defaultPath: defaultFileName
@@ -79,24 +75,28 @@ async function handleExportData (data) {
     })
     return
   }
+  const { selection, products } = data
+  const selectionCsv = new ObjectsToCsv([selection, {}])
+  const productsCsv = new ObjectsToCsv(products)
   // selectionCsv.toDisk(path.filePath, { append: true })
+  selectionCsv.toDisk(path.filePath)
   productsCsv.toDisk(path.filePath, { append: true })
 }
 
 function formatFileName (timestamp) {
   let cleanedString = timestamp.replace(/[<>:"/\\|?*]/g, '')
-  // Replace illegal characters with underscores
-  cleanedString = cleanedString.replace(/:/g, '_')
+  cleanedString = cleanedString.replace(/:/g, ' ')
   return cleanedString
 }
 
 async function handleSaveData (event, data) {
   const selectionObject = await saveData(data)
   if (selectionObject) {
-    await createDialogInfo(
-      'Успех',
-      `Данные успешно сохранены: ${selectionObject.created}`
-    )
+    await createDialogInfo({
+      title: 'Успех',
+      message: `Данные успешно сохранены: ${selectionObject.created}`,
+      type: 'info'
+    })
     mainWindow.webContents.send('save:products:ok', selectionObject)
   }
 }

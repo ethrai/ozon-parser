@@ -96,9 +96,7 @@ async function parsePage (page, event) {
   const price2Xpath = 'xpath/div[3]/div[1]/span/span[1]'
   const sellerXpath = 'xpath/div[3]/div[2]/div/span/span/font'
   await page.waitForSelector(productsXpath, { timeout: 5000 })
-  /**
-   * @type puppeteer.ElementHandle[]
-   */
+
   let products
   await page.waitForSelector(productsXpath, { timeout: 200 })
   for (let i = 0; i < 10; i++) {
@@ -125,13 +123,13 @@ async function parsePage (page, event) {
       if (products) break
     }
     const product = products[i]
-    const titleEl = await product.waitForSelector(titleXpath, { timeout: 200 })
+    const titleEl = await product.waitForSelector(titleXpath, { timeout: 1000 })
     const title = await titleEl.evaluate((e) => e.textContent.trim())
 
     const url = await titleEl.evaluate((e) => e.href)
     let priceElement
     try {
-      priceElement = await product.waitForSelector(priceXpath, { timeout: 200 })
+      priceElement = await product.waitForSelector(priceXpath, { timeout: 1000 })
     } catch (e) {
       priceElement = await product.waitForSelector(price2Xpath)
     }
