@@ -48,7 +48,7 @@ async function getLatestSelection () {
   )
 }
 
-const getSelections = async () =>
+async function getSelectionProducts(){
   await new Promise((resolve, reject) => {
     db.all(
       `
@@ -65,13 +65,14 @@ const getSelections = async () =>
       }
     )
   })
+}
 
 /**
  *
  * @param {number} selectionId
  * @return {Promise<Object[]>}
  */
-const getSelectionProducts = async (selectionId) => {
+async function getSelection(selectionId) {
   return await new Promise((resolve, reject) => {
     db.all(
       `SELECT title, price, seller, url
@@ -86,7 +87,7 @@ const getSelectionProducts = async (selectionId) => {
   })
 }
 
-const deleteSelection = (selectionId) => {
+function deleteSelection(selectionId) {
   db.run('DELETE FROM Selection WHERE id=?', selectionId, (err) => {
     if (err) {
       console.error(err)
@@ -105,7 +106,6 @@ function closeDb () {
 
 module.exports = {
   saveData,
-  getSelections,
   getSelectionProducts,
   closeDb,
   getLatestSelection,
